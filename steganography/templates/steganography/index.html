@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Toolbox</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-slate-900 text-white flex-shrink-0 border-r border-slate-800">
+            <div class="p-6">
+                <h1 class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-rose-400 to-orange-400">CryptoHub</h1>
+                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-[0.2em] mt-1">Digital Security Suite</p>
+            </div>
+            <nav class="mt-6 px-4 space-y-2">
+                <button onclick="switchTab('steganography')" id="nav-steganography" 
+                    class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {% if active_tab == 'steganography' %}bg-rose-500/10 text-rose-400 border border-rose-500/20 shadow-[0_0_15px_rgba(244,63,94,0.1)]{% else %}text-slate-400 hover:bg-slate-800 hover:text-slate-200{% endif %}">
+                    <i class="fa-solid fa-eye-slash w-5 text-center"></i>
+                    <span class="font-semibold">Steganography</span>
+                </button>
+                <button onclick="switchTab('gcd')" id="nav-gcd" 
+                    class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {% if active_tab == 'gcd' %}bg-emerald-500/10 text-emerald-400 border border-emerald-500/20{% else %}text-slate-400 hover:bg-slate-800 hover:text-slate-200{% endif %}">
+                    <i class="fa-solid fa-calculator w-5 text-center"></i>
+                    <span class="font-semibold">Euclidean GCD</span>
+                </button>
+                <button onclick="switchTab('egcd')" id="nav-egcd" 
+                    class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-all duration-200 {% if active_tab == 'egcd' %}bg-purple-500/10 text-purple-400 border border-purple-500/20{% else %}text-slate-400 hover:bg-slate-800 hover:text-slate-200{% endif %}">
+                    <i class="fa-solid fa-superscript w-5 text-center"></i>
+                    <span class="font-semibold">Extended Euclidean</span>
+                </button>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto bg-[#fafafa]">
+            <div class="p-8 max-w-6xl mx-auto">
+                
+                <!-- Messages -->
+                {% if error %}
+                    <div class="mb-6 p-4 bg-red-50 border border-red-100 text-red-600 shadow-sm rounded-xl animate-fade-in flex items-center">
+                        <i class="fa-solid fa-circle-exclamation mr-3 text-lg"></i>
+                        <span class="font-medium">{{ error }}</span>
+                    </div>
+                {% endif %}
+                
+                {% if success %}
+                    <div class="mb-6 p-4 bg-rose-50 border border-rose-100 text-rose-600 shadow-sm rounded-xl animate-fade-in flex items-center">
+                        <i class="fa-solid fa-circle-check mr-3 text-lg"></i>
+                        <span class="font-medium">{{ success }}</span>
+                    </div>
+                {% endif %}
+
+                <!-- Tab: Steganography -->
+                <div id="tab-steganography" class="tab-content {% if active_tab != 'steganography' %}hidden{% endif %}">
+                    <div class="mb-10">
+                        <span class="px-3 py-1 bg-rose-100 text-rose-600 text-xs font-bold uppercase tracking-widest rounded-full">Secure Module</span>
+                        <h2 class="text-4xl font-black text-slate-900 mt-3 tracking-tight">Image Steganography</h2>
+                        <p class="text-slate-500 mt-2 text-lg">Conceal sensitive data within pixels using advanced LSB encoding.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Encode Card -->
+                        <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden group">
+                            <div class="bg-gradient-to-r from-rose-500 to-rose-600 px-8 py-6">
+                                <h3 class="text-white text-xl font-bold flex items-center italic">
+                                    <i class="fa-solid fa-fingerprint mr-3 text-rose-200"></i> ENCODE SECRET
+                                </h3>
+                            </div>
+                            <form method="post" enctype="multipart/form-data" class="p-8 space-y-6">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="encode">
+                                <input type="hidden" name="tab" value="steganography">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Carrier Image</label>
+                                    <div class="relative group">
+                                        <input type="file" name="image" accept="image/*" required
+                                            class="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-rose-50 file:text-rose-600 hover:file:bg-rose-100 border-2 border-dashed border-slate-200 rounded-2xl p-2 transition-all group-hover:border-rose-300">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Secret Message</label>
+                                    <textarea name="message" rows="4" required placeholder="What is the hidden truth?"
+                                        class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-rose-500/10 focus:border-rose-500 focus:bg-white outline-none transition-all resize-none text-slate-800 font-medium"></textarea>
+                                </div>
+                                <button type="submit" class="w-full bg-slate-900 hover:bg-rose-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-rose-200/50 transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-sm">
+                                    Generate Stealth Image
+                                </button>
+                            </form>
+                            {% if encoded_image_url %}
+                                <div class="p-8 bg-rose-50/50 border-t border-rose-100">
+                                    <p class="font-black text-rose-900 mb-4 text-xs uppercase tracking-[0.2em]">Output Ready</p>
+                                    <div class="relative group mb-6">
+                                        <img src="{{ encoded_image_url }}" class="rounded-2xl shadow-2xl max-h-56 mx-auto border-4 border-white">
+                                        <div class="absolute inset-0 bg-rose-600/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl pointer-events-none"></div>
+                                    </div>
+                                    <a href="{{ encoded_image_url }}" download class="flex items-center justify-center space-x-2 bg-white text-rose-600 border-2 border-rose-600 font-bold py-3 rounded-2xl hover:bg-rose-600 hover:text-white transition-all shadow-lg shadow-rose-100">
+                                        <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+                                        <span>DOWNLOAD ENCODED PNG</span>
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Decode Card -->
+                        <div class="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+                            <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-8 py-6">
+                                <h3 class="text-white text-xl font-bold flex items-center italic">
+                                    <i class="fa-solid fa-key mr-3 text-slate-400"></i> DECODE VAULT
+                                </h3>
+                            </div>
+                            <form method="post" enctype="multipart/form-data" class="p-8 space-y-6">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="decode">
+                                <input type="hidden" name="tab" value="steganography">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Target Image</label>
+                                    <div class="relative group">
+                                        <input type="file" name="image" accept="image/*" required
+                                            class="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 border-2 border-dashed border-slate-200 rounded-2xl p-2 transition-all group-hover:border-slate-400">
+                                    </div>
+                                </div>
+                                <button type="submit" class="w-full bg-rose-600 hover:bg-slate-900 text-white font-black py-4 rounded-2xl shadow-xl shadow-rose-200/30 transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-sm">
+                                    Extract Intel
+                                </button>
+                            </form>
+                            {% if decoded_message %}
+                                <div class="p-8 bg-slate-900 border-t border-slate-800">
+                                    <p class="font-black text-slate-400 mb-4 text-xs uppercase tracking-[0.2em]">Decrypted Intel</p>
+                                    <div class="p-5 bg-slate-800/50 rounded-2xl border border-slate-700 text-rose-400 break-words font-mono text-lg shadow-inner">
+                                        <span class="text-slate-500 mr-2">></span>{{ decoded_message }}
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: GCD -->
+                <div id="tab-gcd" class="tab-content {% if active_tab != 'gcd' %}hidden{% endif %}">
+                    <div class="mb-10">
+                        <span class="px-3 py-1 bg-emerald-100 text-emerald-600 text-xs font-bold uppercase tracking-widest rounded-full">Mathematics Module</span>
+                        <h2 class="text-4xl font-black text-slate-900 mt-3 tracking-tight">Euclidean GCD</h2>
+                        <p class="text-slate-500 mt-2 text-lg">Find the Greatest Common Divisor of two integers with speed.</p>
+                    </div>
+                    <div class="max-w-2xl bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 px-8 py-6">
+                            <h3 class="text-white text-xl font-bold flex items-center italic">
+                                <i class="fa-solid fa-equals mr-3 text-emerald-200"></i> GCD CALCULATOR
+                            </h3>
+                        </div>
+                        <form method="post" class="p-8 space-y-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="calculate_gcd">
+                            <input type="hidden" name="tab" value="gcd">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Number A</label>
+                                    <input type="number" name="a" value="{{ input_a }}" required placeholder="e.g. 48"
+                                        class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white outline-none transition-all text-slate-800 font-medium text-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Number B</label>
+                                    <input type="number" name="b" value="{{ input_b }}" required placeholder="e.g. 18"
+                                        class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 focus:bg-white outline-none transition-all text-slate-800 font-medium text-lg">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-emerald-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-emerald-200/50 transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-sm">
+                                Compute Greatest Common Divisor
+                            </button>
+                        </form>
+                        {% if gcd_result is not None %}
+                            <div class="p-8 bg-emerald-50/50 border-t border-emerald-100 text-center">
+                                <p class="font-black text-emerald-900 mb-2 text-xs uppercase tracking-[0.2em]">Calculation Result</p>
+                                <div class="text-6xl font-black text-emerald-600 drop-shadow-sm">
+                                    {{ gcd_result }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Tab: Extended GCD -->
+                <div id="tab-egcd" class="tab-content {% if active_tab != 'egcd' %}hidden{% endif %}">
+                    <div class="mb-10">
+                        <span class="px-3 py-1 bg-purple-100 text-purple-600 text-xs font-bold uppercase tracking-widest rounded-full">Linear Algebra Module</span>
+                        <h2 class="text-4xl font-black text-slate-900 mt-3 tracking-tight">Extended Euclidean</h2>
+                        <p class="text-slate-500 mt-2 text-lg">Calculate coefficients x and y such that ax + by = gcd(a, b).</p>
+                    </div>
+                    <div class="max-w-3xl bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 overflow-hidden">
+                        <div class="bg-gradient-to-r from-purple-500 to-purple-600 px-8 py-6">
+                            <h3 class="text-white text-xl font-bold flex items-center italic">
+                                <i class="fa-solid fa-code-merge mr-3 text-purple-200"></i> EXTENDED GCD CALCULATOR
+                            </h3>
+                        </div>
+                        <form method="post" class="p-8 space-y-6">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="calculate_egcd">
+                            <input type="hidden" name="tab" value="egcd">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Coefficient a</label>
+                                    <input type="number" name="a" value="{{ input_a }}" required placeholder="e.g. 240"
+                                        class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 focus:bg-white outline-none transition-all text-slate-800 font-medium text-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-2 uppercase tracking-wide">Coefficient b</label>
+                                    <input type="number" name="b" value="{{ input_b }}" required placeholder="e.g. 46"
+                                        class="w-full px-5 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 focus:bg-white outline-none transition-all text-slate-800 font-medium text-lg">
+                                </div>
+                            </div>
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-purple-600 text-white font-black py-4 rounded-2xl shadow-xl shadow-purple-200/50 transition-all transform hover:-translate-y-1 active:scale-95 uppercase tracking-widest text-sm">
+                                Solve Linear Diophantine Equation
+                            </button>
+                        </form>
+                        {% if egcd_result %}
+                            <div class="p-8 bg-purple-50/50 border-t border-purple-100">
+                                <p class="font-black text-purple-900 mb-6 text-xs uppercase tracking-[0.2em] text-center">Solution Details</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                                    <div class="text-center p-6 bg-white rounded-2xl shadow-sm border border-purple-100">
+                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">GCD</p>
+                                        <p class="text-3xl font-black text-purple-600">{{ egcd_result.gcd }}</p>
+                                    </div>
+                                    <div class="text-center p-6 bg-white rounded-2xl shadow-sm border border-purple-100">
+                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">x Value</p>
+                                        <p class="text-3xl font-black text-purple-600">{{ egcd_result.x }}</p>
+                                    </div>
+                                    <div class="text-center p-6 bg-white rounded-2xl shadow-sm border border-purple-100">
+                                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mb-2">y Value</p>
+                                        <p class="text-3xl font-black text-purple-600">{{ egcd_result.y }}</p>
+                                    </div>
+                                </div>
+                                <div class="p-6 bg-slate-900 text-purple-400 rounded-2xl font-mono text-xl text-center overflow-x-auto whitespace-nowrap shadow-inner border border-slate-800">
+                                    <span class="text-slate-600 mr-4 font-bold">EQUATION:</span>{{ egcd_result.equation }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+            });
+            
+            // Show target tab content
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            
+            // Update sidebar styles
+            const navButtons = [
+                { id: 'steganography', active: 'bg-rose-500/10', text: 'text-rose-400', border: 'border-rose-500/20' },
+                { id: 'gcd', active: 'bg-emerald-500/10', text: 'text-emerald-400', border: 'border-emerald-500/20' },
+                { id: 'egcd', active: 'bg-purple-500/10', text: 'text-purple-400', border: 'border-purple-500/20' }
+            ];
+            
+            navButtons.forEach(btn => {
+                const el = document.getElementById('nav-' + btn.id);
+                if (btn.id === tabName) {
+                    el.classList.add(btn.active, btn.text, btn.border);
+                    el.classList.remove('text-slate-400', 'hover:bg-slate-800', 'hover:text-slate-200');
+                } else {
+                    el.classList.remove(btn.active, btn.text, btn.border);
+                    el.classList.add('text-slate-400', 'hover:bg-slate-800', 'hover:text-slate-200');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
